@@ -1,8 +1,8 @@
 CC=g++
 CC_OPTIONS=-I. -I/usr/include -I/usr/include/pqxx
-LD_OPTIONS=-lpthread -lpcap -lpqxx
+LD_OPTIONS=-lpthread -lpcap
 
-TARGET_OBJS=PacketDecodingThread.o connectionstate.o iptcpport.o main.o tcpconnection.o ConnectionMap.o DBThread.o
+TARGET_OBJS=PacketDecodingThread.o connectionstate.o iptcpport.o main.o tcpconnection.o ConnectionMap.o
 TARGET=packet_decoder
 
 $(TARGET):	$(TARGET_OBJS)

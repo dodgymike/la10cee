@@ -1,2 +1,6 @@
 *.o
 Debug
+.cproject
+.project
+packet_decoder
+

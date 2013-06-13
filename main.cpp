@@ -8,7 +8,7 @@
 #include "tcpconnection.h"
 #include "packet_data.h"
 #include "PacketDecodingThread.h"
-#include "DBThread.h"
+//#include "DBThread.h"
 
 char errbuf[PCAP_ERRBUF_SIZE];
 
@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
 
 	//packetDecoderThread.run();
 
+	/*
 	DBThread dbThread(statMaps, dbConnectOptions);
 	pthread_t dbThread_handle;
 
@@ -95,6 +96,7 @@ int main(int argc, char* argv[]) {
 	pthread_attr_init(&db_thread_attributes);
 	pthread_attr_setdetachstate(&db_thread_attributes, PTHREAD_CREATE_DETACHED);
 	pthread_create(&dbThread_handle, &db_thread_attributes, (void *(*)(void *))threadJumpStart, &dbThread);
+	*/
 
 	//long startTime = time(NULL);
 	while((numPackets = pcap_dispatch(live_interface, 1, packet_handler, packetHandlerData)) >= 0) {
