@@ -2,6 +2,7 @@
 #define TCPCONNECTION_H
 
 #include <string>
+#include <time.h>
 
 #include "iptcpport.h"
 #include "connectionstate.h"
@@ -32,6 +33,15 @@ public:
 	u_long packetsOut();
 	u_long packetsOut(u_long newPacketsOut);
 	u_long packetsOutIncrement(u_long newPacketsOut);
+
+	timespec synTime();
+	timespec synTime(timespec synTime);
+
+	timespec synAckTime();
+	timespec synAckTime(timespec synAckTime);
+
+	timespec ackTime();
+	timespec ackTime(timespec ackTime);
 	
 	long connectTime();
 	long connectTime(long newConnectTime);
@@ -78,6 +88,12 @@ private:
 	bool m_stateDestReset;
 	bool m_stateDestFin;
 	
+	// three-way handshake timings
+	timespec m_synTime;
+	timespec m_synAckTime;
+	timespec m_ackTime;
+
+	// connect and close times
 	long m_connectTime;
 	long m_closeTime;
 	

@@ -96,37 +96,21 @@ bool LatencyMonitoringPacketDecodingThread::_updateStats(PacketHeader* curPacket
 	// connection state
 	if(packetSource) {
 		curConnection->bytesInIncrement(curPacket->ipLength());
-		if(curPacket->syn()) {
-			curConnection->stateSourceSyn(true);
-		}
-		if(curPacket->ack()) {
-			curConnection->stateSourceAck(true);
-		}
-		if(curPacket->fin()) {
-			curConnection->stateSourceFin(true);
-		}
-		if(curPacket->rst()) {
-			curConnection->stateSourceReset(true);
-		}
+		curConnection->stateSourceSyn(curPacket->syn());
+		curConnection->stateSourceAck(curPacket->ack());
+		curConnection->stateSourceFin(curPacket->fin());
+		curConnection->stateSourceReset(curPacket->rst());
 		
 		// assume an incoming packet
 		curConnection->packetsInIncrement(1);
 	} else {
 		curConnection->bytesOutIncrement(curPacket->ipLength());
-		if(curPacket->syn()) {
-			curConnection->stateDestSyn(true);
-		}
-		if(curPacket->ack()) {
-			curConnection->stateDestAck(true);
-		}
-		if(curPacket->fin()) {
-			curConnection->stateDestFin(true);
-		}
-		if(curPacket->rst()) {
-			curConnection->stateDestReset(true);
-		}
+		curConnection->stateDestSyn(curPacket->syn());
+		curConnection->stateDestAck(curPacket->ack());
+		curConnection->stateDestFin(curPacket->fin());
+		curConnection->stateDestReset(curPacket->rst());
 			
-			// assume an outgoing packet
+		// assume an outgoing packet
 		curConnection->packetsOutIncrement(1);
 	}
 			
@@ -136,6 +120,7 @@ bool LatencyMonitoringPacketDecodingThread::_updateStats(PacketHeader* curPacket
 	//cerr << "sourceIP (" << sourceIP << ") destinationIP (" << destinationIP << ") sourcePort (" << sourcePort << ") destinationPort (" << destinationPort << ") ";
 	stringstream ss;
 	ss << "sourceIP (" << curPacket->sourceIP() << ") destinationIP (" << curPacket->destinationIP() << ") sourcePort (" << curPacket->sourcePort() << ") destinationPort (" << curPacket->destinationPort() << ") ";
+	// received a reset packet
 	if(curConnection->stateSourceReset() || curConnection->stateDestReset()) {
 		ss << " RESET" << endl;
 		cerr << ss.str();
@@ -143,7 +128,12 @@ bool LatencyMonitoringPacketDecodingThread::_updateStats(PacketHeader* curPacket
 
 		// store the final close time
 		curConnection->closeTime(time(NULL));
-	} else if(curConnection->stateSourceFin() || curConnection->stateDestFin()) {
+
+		return true;
+	}
+	
+	// one side sent a FIN packet
+	if(curConnection->stateSourceFin() || curConnection->stateDestFin()) {
 		if(curConnection->connectionState() == STATE_CLOSED) {
 			ss << "OOOPS - ALREADY CLOSED " << endl;
 		} else if(curConnection->connectionState() == STATE_CLOSED2) {
@@ -161,10 +151,20 @@ bool LatencyMonitoringPacketDecodingThread::_updateStats(PacketHeader* curPacket
 		}
 		cerr << ss.str();
 		//cerr << "closed";
-	} else if(curConnection->stateSourceSyn() && curConnection->stateDestSyn() && curConnection->stateDestAck() && curConnection->stateSourceAck()) {
+
+		return true;
+	} 
+	
+	// connected
+	if(curConnection->stateSourceSyn() && curConnection->stateDestSyn() && curConnection->stateDestAck() && curConnection->stateSourceAck()) {
 		//DbgMsg("connected");
 		curConnection->connectionState(STATE_CONNECTED);
-	} else if(curConnection->stateSourceSyn() || curConnection->stateDestSyn() || curConnection->stateDestAck() || curConnection->stateSourceAck()) {
+
+		return true;
+	}
+	
+	// partially connected
+	if(curConnection->stateSourceSyn() || curConnection->stateDestSyn() || curConnection->stateDestAck() || curConnection->stateSourceAck()) {
 		if(curConnection->connectionState() == STATE_BAD_CONNECTION_SEQUENCE) {
 			// ignore this connection's connect state
 			ss << " IGNORING BAD CONNECT STATE" << endl;
@@ -184,15 +184,17 @@ bool LatencyMonitoringPacketDecodingThread::_updateStats(PacketHeader* curPacket
 				
 		cerr << ss.str();
 		//cerr << "connection in progress";
-	} else {
-		ss << " UNKNOWN" << endl;
-		cerr << ss.str();
-		//cerr << "unknown";
-		curConnection->connectionState(STATE_UNKNOWN);
-	}
+
+		return true;
+	} 
+	
+	ss << " UNKNOWN" << endl;
+	cerr << ss.str();
+	//cerr << "unknown";
+	curConnection->connectionState(STATE_UNKNOWN);
 		
 	//cerr << endl;
 		
-	return true;
+	return false;
 }
 

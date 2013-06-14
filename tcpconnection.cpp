@@ -5,12 +5,12 @@ using namespace std;
 TCPConnection::TCPConnection(const string& srcIp, const u_int srcPort, const string& destIp, const u_int destPort)
 		: m_addresses(srcIp, srcPort, destIp, destPort)
 	{
-	m_bytesIn	= 0;
-	m_bytesOut	= 0;
-	m_packetsIn	= 0;
-	m_packetsOut	= 0;
+	m_bytesIn		= 0;
+	m_bytesOut		= 0;
+	m_packetsIn		= 0;
+	m_packetsOut		= 0;
 	
-	m_connectTime	= 0;
+	m_connectTime		= 0;
 	m_closeTime		= 0;
 	
 	m_stateSourceSyn	= false;
@@ -28,24 +28,24 @@ TCPConnection::TCPConnection(const string& srcIp, const u_int srcPort, const str
 TCPConnection::TCPConnection(const TCPConnection& rhs)
 		: m_addresses(rhs.m_addresses)
 {
-	m_bytesIn = rhs.m_bytesIn;
-	m_bytesOut = rhs.m_bytesOut;
-	m_packetsIn = rhs.m_packetsIn;
-	m_packetsOut = rhs.m_packetsOut;
+	m_bytesIn		= rhs.m_bytesIn;
+	m_bytesOut		= rhs.m_bytesOut;
+	m_packetsIn		= rhs.m_packetsIn;
+	m_packetsOut		= rhs.m_packetsOut;
 	
-	m_connectTime	= rhs.m_connectTime;
+	m_connectTime		= rhs.m_connectTime;
 	m_closeTime		= rhs.m_closeTime;
 	
-	m_stateSourceSyn		= rhs.m_stateSourceSyn;
-	m_stateSourceAck		= rhs.m_stateSourceAck;
-	m_stateSourceReset		= rhs.m_stateSourceReset;
-	m_stateSourceFin		= rhs.m_stateSourceFin;
-	m_stateDestSyn			= rhs.m_stateDestSyn;
-	m_stateDestAck			= rhs.m_stateDestAck;
-	m_stateDestReset		= rhs.m_stateDestReset;
-	m_stateDestFin			= rhs.m_stateDestFin;
+	m_stateSourceSyn	= rhs.m_stateSourceSyn;
+	m_stateSourceAck	= rhs.m_stateSourceAck;
+	m_stateSourceReset	= rhs.m_stateSourceReset;
+	m_stateSourceFin	= rhs.m_stateSourceFin;
+	m_stateDestSyn		= rhs.m_stateDestSyn;
+	m_stateDestAck		= rhs.m_stateDestAck;
+	m_stateDestReset	= rhs.m_stateDestReset;
+	m_stateDestFin		= rhs.m_stateDestFin;
 	
-	m_connectionState		= rhs.m_connectionState;
+	m_connectionState	= rhs.m_connectionState;
 }
 	
 const IPTCPPort& TCPConnection::addresses() {
@@ -211,12 +211,33 @@ ConnectionState TCPConnection::connectionState(ConnectionState state) {
 	return (m_connectionState = state);
 }
 
+timespec TCPConnection::synTime() {
+	return m_synTime;
+}
+timespec TCPConnection::synTime(timespec synTime) {
+	return (m_synTime = synTime);
+}
+
+timespec TCPConnection::synAckTime() {
+	return m_synAckTime;
+}
+timespec TCPConnection::synAckTime(timespec synAckTime) {
+	return (m_synAckTime = synAckTime);
+}
+
+timespec TCPConnection::ackTime() {
+	return m_ackTime;
+}
+timespec TCPConnection::ackTime(timespec ackTime) {
+	return (m_ackTime = ackTime);
+}
+
 long TCPConnection::connectTime() {
 	AutoLock autoLock(&m_mutex);
 	
 	return m_connectTime;
 }
-long TCPConnection::TCPConnection::connectTime(long newConnectTime) {
+long TCPConnection::connectTime(long newConnectTime) {
 	AutoLock autoLock(&m_mutex);
 	
 	return (m_connectTime = newConnectTime);

@@ -17,3 +17,6 @@ $(TARGET):	$(TARGET_OBJS)
 	@echo Compiling file [$<] to [$@]
 	$(CC) $(CC_OPTIONS) -c $< -o $@ || rm $@
 
+clean:
+	rm *.o
+
