@@ -131,7 +131,7 @@ void packet_handler(u_char* packetHandlerData_ptr, const pcap_pkthdr* packet_hea
 	
 	cout << "<main>\ttv_sec (" << cur_time.tv_sec << ") tv_nsec (" << cur_time.tv_nsec << ")" << endl;
 
-	PacketHeader* newPacket = new PacketHeader(packet_header, packet_data);
+	PacketHeader* newPacket = new PacketHeader(packet_header, packet_data, cur_time.tv_sec, cur_time.tv_nsec);
 	packetHandlerData->packets.push(newPacket);
 }
 

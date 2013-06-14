@@ -37,7 +37,7 @@ enum IPPacketType {
 
 class PacketHeader {
 public:
-	PacketHeader(const pcap_pkthdr* header, const u_char* data) {
+	PacketHeader(const pcap_pkthdr* header, const u_char* data, time_t p_seconds, long p_nanoseconds) {
 		// default to a bad packet
 		m_validPacket = false;
 		m_packetType = PACKET_UNKNOWN;
@@ -51,6 +51,8 @@ public:
 		m_sourcePort = -1;
 		m_destinationPort = -1;
 
+		m_pSeconds = p_seconds;
+		m_pNanoSeconds = p_nanoseconds;
 		
 		_decodePacket(header, data);
 	}
@@ -58,6 +60,13 @@ public:
 	~PacketHeader() {
 	}
 	
+	time_t pSeconds() {
+		return m_pSeconds;
+	}
+	long pNanoSeconds() {
+		return m_pNanoSeconds;
+	}
+
 	PacketType packetType() {
 		return m_packetType;
 	}
@@ -126,6 +135,9 @@ private:
 	
 	u_int16_t m_sourcePort;
 	u_int16_t m_destinationPort;
+
+	time_t m_pSeconds;
+	long m_pNanoSeconds;
 	
 	bool m_fin;
 	bool m_syn;
