@@ -8,6 +8,7 @@
 #include "tcpconnection.h"
 #include "packet_data.h"
 #include "PacketDecodingThread.h"
+#include "LatencyMonitoringPacketDecodingThread.h"
 //#include "DBThread.h"
 
 char errbuf[PCAP_ERRBUF_SIZE];
@@ -53,12 +54,16 @@ int main(int argc, char* argv[]) {
 
 	errbuf[0] = 0;
 	char* cur_interface_name = "lo";
-	char* dbConnectOptions = "dbname=traffic_stats user=traffic password=traffic";
+	char* decoder_thread_type = "standard";
 
+	cout << "checking args" << endl;
 	if(argc > 2) {
-		dbConnectOptions = argv[2];
-	} else if(argc > 1) {
+		decoder_thread_type = argv[2];
+		cout << "\tdecoder_thread_type (" << decoder_thread_type << ")" << endl;
+	} 
+	if(argc > 1) {
 		cur_interface_name = argv[1];
+		cout << "interface_name (" << cur_interface_name << ")" << endl;
 	}
 	
 	pcap_t* live_interface = pcap_open_live(cur_interface_name, MAX_PACKET_CAPTURE_SIZE, true, 100, errbuf);
@@ -78,30 +83,33 @@ int main(int argc, char* argv[]) {
 
 	StatMaps* statMaps = new StatMaps();
 	
-	PacketDecodingThread packetDecoderThread((PacketHandlerData*)packetHandlerData, statMaps);
 	pthread_t decodingThread_handle;
 
 	pthread_attr_t packet_thread_attributes;
 	pthread_attr_init(&packet_thread_attributes);
 	pthread_attr_setdetachstate(&packet_thread_attributes, PTHREAD_CREATE_DETACHED);
-	pthread_create(&decodingThread_handle, &packet_thread_attributes, (void *(*)(void *))threadJumpStart, &packetDecoderThread);
+
+	// FIXME
+	PacketDecodingThread packetDecoderThread((PacketHandlerData*)packetHandlerData, statMaps);
+	LatencyMonitoringPacketDecodingThread latencyMonitoringPacketDecoderThread((PacketHandlerData*)packetHandlerData, statMaps);
+
+	void* decoder_thread = NULL;
+	if(strcmp("latency", decoder_thread_type) == 0) {
+		cout << "using latency thread" << endl;
+		decoder_thread = &latencyMonitoringPacketDecoderThread;
+	} else {
+		cout << "using decoder thread" << endl;
+		decoder_thread = &packetDecoderThread;
+	}
+
+	pthread_create(&decodingThread_handle, &packet_thread_attributes, (void *(*)(void *))threadJumpStart, decoder_thread);
 
 	//packetDecoderThread.run();
-
-	/*
-	DBThread dbThread(statMaps, dbConnectOptions);
-	pthread_t dbThread_handle;
-
-	pthread_attr_t db_thread_attributes;
-	pthread_attr_init(&db_thread_attributes);
-	pthread_attr_setdetachstate(&db_thread_attributes, PTHREAD_CREATE_DETACHED);
-	pthread_create(&dbThread_handle, &db_thread_attributes, (void *(*)(void *))threadJumpStart, &dbThread);
-	*/
 
 	//long startTime = time(NULL);
 	while((numPackets = pcap_dispatch(live_interface, 1, packet_handler, packetHandlerData)) >= 0) {
 		totalPackets += numPackets;
-		//cerr << "total packets [" << totalPackets << "]" << endl;
+		cerr << "total packets [" << totalPackets << "]" << endl;
 		
 		/*
 		if((time(NULL) - startTime) > 800) {
@@ -117,8 +125,12 @@ int main(int argc, char* argv[]) {
 void packet_handler(u_char* packetHandlerData_ptr, const pcap_pkthdr* packet_header, const u_char* packet_data) {
 	PacketHandlerData* packetHandlerData = (PacketHandlerData*)packetHandlerData_ptr;
 	
-	//cerr << "<packet_handler>\tpacket_header caplen [" << packet_header->caplen << "] len [" << packet_header->len << "]" << endl;
+	cerr << "<packet_handler>\tpacket_header caplen [" << packet_header->caplen << "] len [" << packet_header->len << "]" << endl;
+	timespec cur_time;
+	clock_gettime(CLOCK_REALTIME, &cur_time);
 	
+	cout << "<main>\ttv_sec (" << cur_time.tv_sec << ") tv_nsec (" << cur_time.tv_nsec << ")" << endl;
+
 	PacketHeader* newPacket = new PacketHeader(packet_header, packet_data);
 	packetHandlerData->packets.push(newPacket);
 }
