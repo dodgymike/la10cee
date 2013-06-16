@@ -5,8 +5,9 @@
 #include <time.h>
 
 #include "iptcpport.h"
-#include "connectionstate.h"
 #include "threadhelpers.h"
+#include "packet_data.h"
+#include "connectionstate.h"
 
 using namespace std;
 
@@ -15,6 +16,9 @@ class TCPConnection
 public:
 	TCPConnection(const string& srcIp, const u_int srcPort, const string& destIp, const u_int destPort);
 	TCPConnection(const TCPConnection& rhs);
+
+	//void setConnectionDetails(const string& srcIp, const u_int srcPort, const string& destIp, const u_int destPort);
+	bool handlePacket(PacketHeader* curPacket);
 
 	const IPTCPPort& addresses();
 
@@ -49,6 +53,7 @@ public:
 	long closeTime();
 	long closeTime(long newCloseTime);
 	
+	TCPConnectionState* connectionState();
 	bool stateSourceSyn();
 	bool stateSourceAck();
 	bool stateSourceReset();
@@ -67,9 +72,6 @@ public:
 	bool stateDestReset(bool reset);
 	bool stateDestFin(bool fin);
 	
-	ConnectionState connectionState();
-	ConnectionState connectionState(ConnectionState state);
-	
 	int operator<(const IPTCPPort& rhs) const;
 private:
 	IPTCPPort m_addresses;
@@ -79,6 +81,8 @@ private:
 	u_long m_packetsOut;
 
 	// state
+	TCPConnectionState* m_connectionState;
+
 	bool m_stateSourceSyn;
 	bool m_stateSourceAck;
 	bool m_stateSourceReset;
@@ -96,8 +100,6 @@ private:
 	// connect and close times
 	long m_connectTime;
 	long m_closeTime;
-	
-	ConnectionState m_connectionState;
 	
 	resourceMutexRetryLock m_mutex;
 };

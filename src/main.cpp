@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
 	//long startTime = time(NULL);
 	while((numPackets = pcap_dispatch(live_interface, 1, packet_handler, packetHandlerData)) >= 0) {
 		totalPackets += numPackets;
-		cerr << "total packets [" << totalPackets << "]" << endl;
+		//cerr << "total packets [" << totalPackets << "]" << endl;
 		
 		/*
 		if((time(NULL) - startTime) > 800) {
@@ -125,13 +125,13 @@ int main(int argc, char* argv[]) {
 void packet_handler(u_char* packetHandlerData_ptr, const pcap_pkthdr* packet_header, const u_char* packet_data) {
 	PacketHandlerData* packetHandlerData = (PacketHandlerData*)packetHandlerData_ptr;
 	
-	cerr << "<packet_handler>\tpacket_header caplen [" << packet_header->caplen << "] len [" << packet_header->len << "]" << endl;
+	//cerr << "<packet_handler>\tpacket_header caplen [" << packet_header->caplen << "] len [" << packet_header->len << "]" << endl;
 	timespec cur_time;
 	clock_gettime(CLOCK_REALTIME, &cur_time);
 	
-	cout << "<main>\ttv_sec (" << cur_time.tv_sec << ") tv_nsec (" << cur_time.tv_nsec << ")" << endl;
+	//cout << "<main>\ttv_sec (" << cur_time.tv_sec << ") tv_nsec (" << cur_time.tv_nsec << ")" << endl;
 
-	PacketHeader* newPacket = new PacketHeader(packet_header, packet_data, cur_time.tv_sec, cur_time.tv_nsec);
+	PacketHeader* newPacket = new PacketHeader(packet_header, packet_data, cur_time);
 	packetHandlerData->packets.push(newPacket);
 }
 

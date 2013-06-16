@@ -21,6 +21,6 @@ obj/%.o: obj src/%.cpp include/%.h
 	$(CC) $(CC_OPTIONS) -c $< -o $@ || rm $@
 
 clean:
-	rm packet_decoder
 	rm obj/*.o
+	rm -f packet_decoder 
 

@@ -1,48 +1,44 @@
 #ifndef CONNECTION_STATE_H
 #define CONNECTION_STATE_H
 
-enum ConnectionState { 
-	STATE_NEW = 0, 
-	STATE_CONNECTING1, 
-	STATE_CONNECTING2, 
-	STATE_BAD_CONNECTION_SEQUENCE, 
-	STATE_CONNECTED, 
-	STATE_CLOSING, 
-	STATE_RESET, 
-	STATE_CLOSED1, 
-	STATE_CLOSED2, 
-	STATE_CLOSED, 
-	STATE_UNKNOWN 
-}; 
+#include "packet_data.h"
 
-/*
+using namespace std;
+
+class TCPConnection;
+
 class TCPConnectionState {
 public:
-	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader) = 0;
+	virtual TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader) = 0;
 };
 
-class TCPConnectionStateSyn {
+class TCPConnectionStateNew : public TCPConnectionState {
 	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
 };
 
-class TCPConnectionStateSynAck {
+class TCPConnectionStateSyn : public TCPConnectionState {
 	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
 };
 
-class TCPConnectionStateAck {
+class TCPConnectionStateSynAck : public TCPConnectionState {
 	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
 };
 
-class TCPConnectionStateConnected {
+class TCPConnectionStateAck : public TCPConnectionState {
 	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
 };
 
-class TCPConnectionStateClosed {
+class TCPConnectionStateConnected : public TCPConnectionState {
 	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
 };
-*/
 
-//std::ostream& operator<< (std::ostream & os, ConnectionState state);
+class TCPConnectionStateClosed : public TCPConnectionState {
+	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
+};
+
+class TCPConnectionStateReset : public TCPConnectionState {
+	TCPConnectionState* nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader);
+};
 
 #endif
 

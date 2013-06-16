@@ -10,12 +10,12 @@
 #include <sstream>
 
 
-#include "connectionstate.h"
+/*
 #include "iptcpport.h"
 #include "tcpconnection.h"
 #include "exception.h"
 #include "ConnectionMap.h"
-
+*/
 
 typedef LockedStatsMap<string, u_long> TotalStats_t;
 typedef LockedStatsMap<u_int, u_long> TotalPortStats_t;

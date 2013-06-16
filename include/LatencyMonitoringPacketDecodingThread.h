@@ -17,6 +17,8 @@
 #include "exception.h"
 #include "ConnectionMap.h"
 
+#include "stats.h"
+
 using namespace std;
 
 

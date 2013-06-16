@@ -13,6 +13,8 @@ TCPConnection::TCPConnection(const string& srcIp, const u_int srcPort, const str
 	m_connectTime		= 0;
 	m_closeTime		= 0;
 	
+	m_connectionState	= NULL;
+
 	m_stateSourceSyn	= false;
 	m_stateSourceAck	= false;
 	m_stateSourceReset	= false;
@@ -21,8 +23,6 @@ TCPConnection::TCPConnection(const string& srcIp, const u_int srcPort, const str
 	m_stateDestAck		= false;
 	m_stateDestReset	= false;
 	m_stateDestFin		= false;
-	
-	m_connectionState = STATE_NEW;
 }
 	
 TCPConnection::TCPConnection(const TCPConnection& rhs)
@@ -36,6 +36,8 @@ TCPConnection::TCPConnection(const TCPConnection& rhs)
 	m_connectTime		= rhs.m_connectTime;
 	m_closeTime		= rhs.m_closeTime;
 	
+	m_connectionState	= rhs.m_connectionState;
+
 	m_stateSourceSyn	= rhs.m_stateSourceSyn;
 	m_stateSourceAck	= rhs.m_stateSourceAck;
 	m_stateSourceReset	= rhs.m_stateSourceReset;
@@ -44,10 +46,37 @@ TCPConnection::TCPConnection(const TCPConnection& rhs)
 	m_stateDestAck		= rhs.m_stateDestAck;
 	m_stateDestReset	= rhs.m_stateDestReset;
 	m_stateDestFin		= rhs.m_stateDestFin;
-	
-	m_connectionState	= rhs.m_connectionState;
 }
+
+bool TCPConnection::handlePacket(PacketHeader* curPacket) {
+	{
+		AutoLock autoLock(&m_mutex);
 	
+		if(m_connectionState == NULL) {
+			m_connectionState = new TCPConnectionStateNew();
+		}
+	}
+
+	TCPConnectionState* nextState = m_connectionState->nextStep(*this, *curPacket);
+	if(nextState == NULL) {
+		cerr << "TCPConnection: got a bad next state!" << endl;
+		return false;
+	}
+
+	{
+		AutoLock autoLock(&m_mutex);
+		m_connectionState = nextState;
+	}
+
+	return true;
+}
+
+TCPConnectionState* TCPConnection::connectionState() {
+	AutoLock autoLock(&m_mutex);
+
+	return m_connectionState;
+}
+
 const IPTCPPort& TCPConnection::addresses() {
 	AutoLock autoLock(&m_mutex);
 	
@@ -198,17 +227,6 @@ bool TCPConnection::stateDestFin(bool fin) {
 	AutoLock autoLock(&m_mutex);
 	
 	return (m_stateDestFin = fin);
-}
-
-ConnectionState TCPConnection::connectionState() {
-	AutoLock autoLock(&m_mutex);
-	
-	return m_connectionState;
-}
-ConnectionState TCPConnection::connectionState(ConnectionState state) {
-	AutoLock autoLock(&m_mutex);
-	
-	return (m_connectionState = state);
 }
 
 timespec TCPConnection::synTime() {

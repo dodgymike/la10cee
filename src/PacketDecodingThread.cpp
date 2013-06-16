@@ -134,6 +134,7 @@ bool PacketDecodingThread::_updateStats(PacketHeader* curPacket) {
 			//cerr << "sourceIP (" << sourceIP << ") destinationIP (" << destinationIP << ") sourcePort (" << sourcePort << ") destinationPort (" << destinationPort << ") ";
 			stringstream ss;
 			ss << "sourceIP (" << curPacket->sourceIP() << ") destinationIP (" << curPacket->destinationIP() << ") sourcePort (" << curPacket->sourcePort() << ") destinationPort (" << curPacket->destinationPort() << ") ";
+			/*
 			if(curConnection->stateSourceReset() || curConnection->stateDestReset()) {
 				ss << " RESET" << endl;
 				cerr << ss.str();
@@ -188,6 +189,7 @@ bool PacketDecodingThread::_updateStats(PacketHeader* curPacket) {
 				//cerr << "unknown";
 				curConnection->connectionState(STATE_UNKNOWN);
 			}
+			*/
 			
 			//cerr << endl;
 		} else if(curPacket->ipPacketType() == IP_UDP) {
