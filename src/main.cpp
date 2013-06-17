@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 
+#include <syslog.h>
+
 #include "object_queue.h"
 #include "connectionstate.h"
 #include "iptcpport.h"
@@ -51,6 +53,8 @@ int main(int argc, char* argv[]) {
 	if(!dumpInterfaces()) {
 		return -1;
 	}
+
+	openlog("latency-monitor", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
 
 	errbuf[0] = 0;
 	char* cur_interface_name = "lo";
@@ -137,6 +141,8 @@ int main(int argc, char* argv[]) {
 		*/
 	}
 	cerr << "got numPackets [" << numPackets << "]" << endl;
+
+	closelog();
 
 	return 0;
 }

@@ -1,5 +1,8 @@
 #include "tcpconnection.h"
 
+#include <sstream>
+#include <syslog.h>
+
 using namespace std;
 
 TCPConnection::TCPConnection(const string& srcIp, const u_int srcPort, const string& destIp, const u_int destPort)
@@ -85,6 +88,11 @@ void TCPConnection::dumpTimings() {
 	cerr << "timings:" << endl;
 	cerr << "\tsynack seconds (" << synAckLatency.tv_sec << ") nsec (" << synAckLatency.tv_nsec << ")" << endl;
 	cerr << "\tackack seconds (" << ackAckLatency.tv_sec << ") nsec (" << ackAckLatency.tv_nsec << ")" << endl;
+
+	stringstream timingData;
+	timingData << "type=timing,synack=" << synAckLatency.tv_sec << ":" << synAckLatency.tv_nsec << ",ackack=" << ackAckLatency.tv_sec << ":" << ackAckLatency.tv_nsec;
+
+	syslog (LOG_INFO, timingData.str().c_str());
 }
 
 TCPConnectionState* TCPConnection::connectionState() {
