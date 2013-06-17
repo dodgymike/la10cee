@@ -4,14 +4,17 @@
 TCPConnectionState* TCPConnectionStateNew::nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader) {
 	// check for a valid syn flag
 	if(!packetHeader.syn()) {
+		cerr << "connection state new, src ip (" << packetHeader.sourceIP() << ") port (" << packetHeader.sourcePort() << ") dest ip (" << packetHeader.destinationIP() << ") port (" << packetHeader.destinationPort() << ") syn (" << packetHeader.syn() << ") ack (" << packetHeader.ack() << ") rst (" << packetHeader.rst() << ") fin (" << packetHeader.fin() << ")" << endl;
 		cerr << "connection state new, first packet does not have syn flag set" << endl;
 		return NULL;
 	}
 
-	cerr << "!!! connection state new, got syn" << endl;
+	//cerr << "!!! connection state new, got syn" << endl;
 
 	tcpConnection.stateSourceSyn(true);
 	tcpConnection.synTime(packetHeader.receivedTime());
+
+	//cerr << "synTime (" << tcpConnection.synTime().tv_sec << ":" << tcpConnection.synTime().tv_nsec << endl;
 
 	return new TCPConnectionStateSyn();
 }
@@ -36,11 +39,14 @@ TCPConnectionState* TCPConnectionStateSyn::nextStep(TCPConnection& tcpConnection
 		return NULL;
 	}
 
-	cerr << "!!! connection state new, got syn-ack" << endl;
+	//cerr << "!!! connection state new, got syn-ack" << endl;
 
 	tcpConnection.stateDestSyn(true);
 	tcpConnection.stateDestAck(true);
 	tcpConnection.synAckTime(packetHeader.receivedTime());
+
+	//cerr << "synTime (" << tcpConnection.synTime().tv_sec << ":" << tcpConnection.synTime().tv_nsec << endl;
+	//cerr << "synAckTime (" << tcpConnection.synAckTime().tv_sec << ":" << tcpConnection.synAckTime().tv_nsec << endl;
 
 	return new TCPConnectionStateSynAck();
 }
@@ -58,10 +64,14 @@ TCPConnectionState* TCPConnectionStateSynAck::nextStep(TCPConnection& tcpConnect
 		return NULL;
 	}
 
-	cerr << "!!! connection state new, got final ack" << endl;
+	//cerr << "!!! connection state new, got final ack" << endl;
 
 	tcpConnection.stateSourceAck(true);
 	tcpConnection.ackTime(packetHeader.receivedTime());
+
+	//cerr << "synTime (" << tcpConnection.synTime().tv_sec << ":" << tcpConnection.synTime().tv_nsec << endl;
+	//cerr << "synAckTime (" << tcpConnection.synAckTime().tv_sec << ":" << tcpConnection.synAckTime().tv_nsec << endl;
+	//cerr << "ackTime (" << tcpConnection.ackTime().tv_sec << ":" << tcpConnection.ackTime().tv_nsec << endl;
 
 	tcpConnection.dumpTimings();
 

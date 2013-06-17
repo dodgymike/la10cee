@@ -55,8 +55,13 @@ int main(int argc, char* argv[]) {
 	errbuf[0] = 0;
 	char* cur_interface_name = "lo";
 	char* decoder_thread_type = "standard";
+	char* filter_string = NULL;
 
 	cout << "checking args" << endl;
+	if(argc > 3) {
+		filter_string = argv[3];
+		cout << "\tfilter (" << filter_string << ")" << endl;
+	}
 	if(argc > 2) {
 		decoder_thread_type = argv[2];
 		cout << "\tdecoder_thread_type (" << decoder_thread_type << ")" << endl;
@@ -75,6 +80,20 @@ int main(int argc, char* argv[]) {
 	// safety check
 	if(strlen(errbuf) != 0) {
 		cerr << "interface [" << cur_interface_name << "] open, but error received [" << errbuf << "], continuing" << endl;
+	}
+
+	if(filter_string != NULL) {
+		bpf_program filterProgram;
+
+		if(pcap_compile(live_interface, &filterProgram, filter_string, 0, PCAP_NETMASK_UNKNOWN) != 0) {
+			cerr << "INVALID FILTER (" << filter_string << ")" << endl;
+			return -1;
+		}
+
+		if(pcap_setfilter(live_interface, &filterProgram) != 0) {
+			cerr << "ERROR APPLYING FILTER (" << filter_string << ")" << endl;
+			return -1;
+		}
 	}
 	
 	u_char* packetHandlerData = (u_char*)new PacketHandlerData;

@@ -73,12 +73,12 @@ bool LatencyMonitoringPacketDecodingThread::_updateStats(PacketHeader* curPacket
 	auto_ptr<PacketHeader> curPacketAuto(curPacket);
 	
 	if(curPacket->packetType() != PACKET_IP) {
-		cerr << "NON-IP PACKET" << endl;
+//		cerr << "NON-IP PACKET" << endl;
 		return false;
 	}
 
 	if(curPacket->ipPacketType() != IP_TCP) {
-		cerr << "\tNON-TCP PACKET" << endl;
+//		cerr << "\tNON-TCP PACKET" << endl;
 		return false;
 	}
 

@@ -84,7 +84,7 @@ void TCPConnection::dumpTimings() {
 
 	cerr << "timings:" << endl;
 	cerr << "\tsynack seconds (" << synAckLatency.tv_sec << ") nsec (" << synAckLatency.tv_nsec << ")" << endl;
-	cerr << "\tackack seconds (" << ackAckLatency.tv_sec << ") nsec (" << synAckLatency.tv_nsec << ")" << endl;
+	cerr << "\tackack seconds (" << ackAckLatency.tv_sec << ") nsec (" << ackAckLatency.tv_nsec << ")" << endl;
 }
 
 TCPConnectionState* TCPConnection::connectionState() {
