@@ -63,6 +63,8 @@ TCPConnectionState* TCPConnectionStateSynAck::nextStep(TCPConnection& tcpConnect
 	tcpConnection.stateSourceAck(true);
 	tcpConnection.ackTime(packetHeader.receivedTime());
 
+	tcpConnection.dumpTimings();
+
 	return new TCPConnectionStateConnected();
 }
 

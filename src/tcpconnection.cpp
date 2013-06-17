@@ -71,6 +71,22 @@ bool TCPConnection::handlePacket(PacketHeader* curPacket) {
 	return true;
 }
 
+void TCPConnection::dumpTimings() {
+	AutoLock autoLock(&m_mutex);
+
+	timespec synAckLatency, ackAckLatency;
+	timespec_subtract(&synAckLatency, synAckTime(), synTime());
+	timespec_subtract(&ackAckLatency, ackTime(), synAckTime());
+	/*
+	timespec_subtract(&synAckLatency, synTime(), synAckTime());
+	timespec_subtract(&ackAckLatency, synAckTime(), ackTime());
+	*/
+
+	cerr << "timings:" << endl;
+	cerr << "\tsynack seconds (" << synAckLatency.tv_sec << ") nsec (" << synAckLatency.tv_nsec << ")" << endl;
+	cerr << "\tackack seconds (" << ackAckLatency.tv_sec << ") nsec (" << synAckLatency.tv_nsec << ")" << endl;
+}
+
 TCPConnectionState* TCPConnection::connectionState() {
 	AutoLock autoLock(&m_mutex);
 
@@ -229,24 +245,24 @@ bool TCPConnection::stateDestFin(bool fin) {
 	return (m_stateDestFin = fin);
 }
 
-timespec TCPConnection::synTime() {
+const timespec& TCPConnection::synTime() {
 	return m_synTime;
 }
-timespec TCPConnection::synTime(timespec synTime) {
+const timespec& TCPConnection::synTime(timespec synTime) {
 	return (m_synTime = synTime);
 }
 
-timespec TCPConnection::synAckTime() {
+const timespec& TCPConnection::synAckTime() {
 	return m_synAckTime;
 }
-timespec TCPConnection::synAckTime(timespec synAckTime) {
+const timespec& TCPConnection::synAckTime(timespec synAckTime) {
 	return (m_synAckTime = synAckTime);
 }
 
-timespec TCPConnection::ackTime() {
+const timespec& TCPConnection::ackTime() {
 	return m_ackTime;
 }
-timespec TCPConnection::ackTime(timespec ackTime) {
+const timespec& TCPConnection::ackTime(timespec ackTime) {
 	return (m_ackTime = ackTime);
 }
 

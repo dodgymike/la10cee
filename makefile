@@ -2,7 +2,7 @@ CC=g++
 CC_OPTIONS=-Iinclude -I/usr/include -I/usr/include/pqxx
 LD_OPTIONS=-lpthread -lpcap -lrt
 
-TARGET_OBJS=obj/PacketDecodingThread.o obj/LatencyMonitoringPacketDecodingThread.o obj/connectionstate.o obj/iptcpport.o obj/main.o obj/tcpconnection.o obj/ConnectionMap.o
+TARGET_OBJS=obj/PacketDecodingThread.o obj/LatencyMonitoringPacketDecodingThread.o obj/connectionstate.o obj/iptcpport.o obj/main.o obj/tcpconnection.o obj/ConnectionMap.o obj/timespechelpers.o
 TARGET=packet_decoder
 
 $(TARGET):	obj $(TARGET_OBJS)

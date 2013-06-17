@@ -9,6 +9,8 @@
 #include "packet_data.h"
 #include "connectionstate.h"
 
+#include "timespechelpers.h"
+
 using namespace std;
 
 class TCPConnection
@@ -38,20 +40,22 @@ public:
 	u_long packetsOut(u_long newPacketsOut);
 	u_long packetsOutIncrement(u_long newPacketsOut);
 
-	timespec synTime();
-	timespec synTime(timespec synTime);
+	const timespec& synTime();
+	const timespec& synTime(timespec synTime);
 
-	timespec synAckTime();
-	timespec synAckTime(timespec synAckTime);
+	const timespec& synAckTime();
+	const timespec& synAckTime(timespec synAckTime);
 
-	timespec ackTime();
-	timespec ackTime(timespec ackTime);
+	const timespec& ackTime();
+	const timespec& ackTime(timespec ackTime);
 	
 	long connectTime();
 	long connectTime(long newConnectTime);
 	
 	long closeTime();
 	long closeTime(long newCloseTime);
+
+	void dumpTimings();
 	
 	TCPConnectionState* connectionState();
 	bool stateSourceSyn();
@@ -105,5 +109,3 @@ private:
 };
 
 #endif
-
-
