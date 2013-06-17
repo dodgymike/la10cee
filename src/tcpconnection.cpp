@@ -75,22 +75,20 @@ bool TCPConnection::handlePacket(PacketHeader* curPacket) {
 }
 
 void TCPConnection::dumpTimings() {
-	AutoLock autoLock(&m_mutex);
-
 	timespec synAckLatency, ackAckLatency;
-	timespec_subtract(&synAckLatency, synAckTime(), synTime());
-	timespec_subtract(&ackAckLatency, ackTime(), synAckTime());
-	/*
-	timespec_subtract(&synAckLatency, synTime(), synAckTime());
-	timespec_subtract(&ackAckLatency, synAckTime(), ackTime());
-	*/
+	{
+		AutoLock autoLock(&m_mutex);
 
-	cerr << "timings:" << endl;
+		timespec_subtract(&synAckLatency, synAckTime(), synTime());
+		timespec_subtract(&ackAckLatency, ackTime(), synAckTime());
+	}
+
+	cerr << "timings (" << addresses().ipA() << ":" << addresses().portA() << ") dest (" << addresses().ipB() << ":" << addresses().portB() << "):" << endl;
 	cerr << "\tsynack seconds (" << synAckLatency.tv_sec << ") nsec (" << synAckLatency.tv_nsec << ")" << endl;
 	cerr << "\tackack seconds (" << ackAckLatency.tv_sec << ") nsec (" << ackAckLatency.tv_nsec << ")" << endl;
 
 	stringstream timingData;
-	timingData << "type=timing,synack=" << synAckLatency.tv_sec << ":" << synAckLatency.tv_nsec << ",ackack=" << ackAckLatency.tv_sec << ":" << ackAckLatency.tv_nsec;
+	timingData << "type=timing,srcip=" << addresses().ipA() << ",srcport=" << addresses().portA() << ",destip=" << addresses().ipB() << ",destport=" << addresses().portB() << ",synack=" << synAckLatency.tv_sec << ":" << synAckLatency.tv_nsec << ",ackack=" << ackAckLatency.tv_sec << ":" << ackAckLatency.tv_nsec;
 
 	syslog (LOG_INFO, timingData.str().c_str());
 }
