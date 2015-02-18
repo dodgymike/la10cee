@@ -1,13 +1,14 @@
 CC=g++
-CC_OPTIONS=-Iinclude -I/usr/include -I/usr/include/pqxx
-LD_OPTIONS=-lpthread -lpcap -lrt
+CC_OPTIONS=-Iinclude -I/usr/include -I/usr/include/pqxx -D_BSD_SOURCE
+#LD_OPTIONS=-lpthread -lpcap -lrt
+LD_OPTIONS=-lpthread -lpcap
 
-TARGET_OBJS=obj/PacketDecodingThread.o obj/LatencyMonitoringPacketDecodingThread.o obj/connectionstate.o obj/iptcpport.o obj/main.o obj/tcpconnection.o obj/ConnectionMap.o obj/timespechelpers.o
+TARGET_OBJS=obj/PacketDecodingThread.o obj/LatencyMonitoringPacketDecodingThread.o obj/connectionstate.o obj/iptcpport.o obj/main.o obj/tcpconnection.o obj/ConnectionMap.o obj/timespechelpers.o obj/packet_data.o obj/clock.o
 TARGET=packet_decoder
 
 $(TARGET):	obj $(TARGET_OBJS)
 	echo building target
-	$(CC) $(LD_OPTIONS) -o $(TARGET) $(TARGET_OBJS)
+	$(CC) -o $(TARGET) $(TARGET_OBJS) $(LD_OPTIONS)
 
 obj:	
 	mkdir obj

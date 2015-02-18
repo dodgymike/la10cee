@@ -90,7 +90,7 @@ void TCPConnection::dumpTimings() {
 	stringstream timingData;
 	timingData << "type=timing,srcip=" << addresses().ipA() << ",srcport=" << addresses().portA() << ",destip=" << addresses().ipB() << ",destport=" << addresses().portB() << ",synack=" << synAckLatency.tv_sec << ":" << synAckLatency.tv_nsec << ",ackack=" << ackAckLatency.tv_sec << ":" << ackAckLatency.tv_nsec;
 
-	syslog (LOG_INFO, timingData.str().c_str());
+	syslog (LOG_INFO, "%s", timingData.str().c_str());
 }
 
 TCPConnectionState* TCPConnection::connectionState() {

@@ -79,9 +79,11 @@ TCPConnectionState* TCPConnectionStateSynAck::nextStep(TCPConnection& tcpConnect
 }
 
 TCPConnectionState* TCPConnectionStateConnected::nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader) {
+	return NULL;
 }
 
 TCPConnectionState* TCPConnectionStateClosed::nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader) {
+	return NULL;
 }
 
 TCPConnectionState* TCPConnectionStateReset::nextStep(TCPConnection& tcpConnection, PacketHeader& packetHeader) {

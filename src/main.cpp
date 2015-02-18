@@ -13,6 +13,8 @@
 #include "LatencyMonitoringPacketDecodingThread.h"
 //#include "DBThread.h"
 
+#include "clock.h"
+
 char errbuf[PCAP_ERRBUF_SIZE];
 
 using namespace std;
@@ -57,8 +59,8 @@ int main(int argc, char* argv[]) {
 	openlog("latency-monitor", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
 
 	errbuf[0] = 0;
-	char* cur_interface_name = "lo";
-	char* decoder_thread_type = "standard";
+	const char* cur_interface_name = "lo";
+	const char* decoder_thread_type = "standard";
 	char* filter_string = NULL;
 
 	cout << "checking args" << endl;
@@ -152,7 +154,7 @@ void packet_handler(u_char* packetHandlerData_ptr, const pcap_pkthdr* packet_hea
 	
 	//cerr << "<packet_handler>\tpacket_header caplen [" << packet_header->caplen << "] len [" << packet_header->len << "]" << endl;
 	timespec cur_time;
-	clock_gettime(CLOCK_REALTIME, &cur_time);
+	current_utc_time(&cur_time);
 	
 	//cout << "<main>\ttv_sec (" << cur_time.tv_sec << ") tv_nsec (" << cur_time.tv_nsec << ")" << endl;
 

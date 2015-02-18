@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <asm-generic/errno-base.h>
+#include "platform.h"
 
 using namespace std;
 
