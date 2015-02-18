@@ -5,6 +5,7 @@
 
 // With help from https://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
 #ifdef __linux
+	#include <time.h>
         #include <netinet/ether.h>
 	#include <asm-generic/errno-base.h>
 #elif __MACH__
